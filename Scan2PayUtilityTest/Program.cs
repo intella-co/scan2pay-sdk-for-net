@@ -7,9 +7,9 @@ namespace Scan2PayUtilityTest
 {
 	class Program
 	{
-		// please contact intella for the following required parameters
+		// please contact intella for the following information
 		// Scan2Pay API URL
-		static string Scan2PayURL = "";
+		static string Scan2PayURL = "https://s.intella.co/allpaypass/api/general";
 		// AES Key to encrypt request body. 
 		// Generate a new AES key for evey transition is recommended.
 		static string AESKey = "Y3UJ147HKIYRT8Ovrsik0A==";
@@ -18,12 +18,13 @@ namespace Scan2PayUtilityTest
 		// Scan2Pay API server RSA public key
 		static string publicKey = @"-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoBpQ54tk1chHugmV0VcT
-....
+...
 -----END PUBLIC KEY-----";
+
 		// Merchant ID
 		static string MchId = "";
 		// Trade key (password), need to be SHA256 hashed
-		static string TradeKey = "";
+		static string TradeKey = "sha256-encoded-string";
 
 
 		static void Main(string[] args)
@@ -36,8 +37,11 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoBpQ54tk1chHugmV0VcT
 			}
 			else
 			{
-				Debug("OLPay Test...");
-				DoOLPayTest();
+				//Debug("OLPay Test...");
+				//DoOLPayTest();
+
+				Debug("Micropay Test...");
+				DoMicropayTest("328523697982290029");
 			}
 
 			Debug("\nPress any key to exit.");
@@ -74,9 +78,30 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoBpQ54tk1chHugmV0VcT
 
 			// data
 			requestMap.Add("DeviceInfo", "skb0001");
-			requestMap.Add("StoreorderNo", DateTime.Now.ToString("yyMMddHHmmss"));	// example: use time-stamp as order number
+			requestMap.Add("StoreOrderNo", DateTime.Now.ToString("yyMMddHHmmss"));	// example: use time-stamp as order number
 			requestMap.Add("Body", "Hot Meal");
-			requestMap.Add("TotalFee", "100");
+			requestMap.Add("TotalFee", "1");
+
+			DoRequest(requestMap);
+		}
+
+		static void DoMicropayTest(string authCode)
+		{
+			Dictionary<string, string> requestMap = new Dictionary<string, string>();
+
+			// header
+			requestMap.Add("Method", "00000");  // not specify payment provider
+			requestMap.Add("ServiceType", "Micropay");
+			requestMap.Add("MchId", MchId);
+			requestMap.Add("CreateTime", DateTime.Now.ToString("yyyyMMddHHmmss"));
+			requestMap.Add("TradeKey", TradeKey);
+
+			// data
+			requestMap.Add("DeviceInfo", "skb0001");
+			requestMap.Add("StoreOrderNo", DateTime.Now.ToString("yyMMddHHmmss"));  // example: use time-stamp as order number
+			requestMap.Add("Body", "Hot Meal");
+			requestMap.Add("TotalFee", "1");
+			requestMap.Add("AuthCode", authCode);
 
 			DoRequest(requestMap);
 		}
